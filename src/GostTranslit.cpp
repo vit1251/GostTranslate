@@ -5,13 +5,25 @@
 #include "GostTranslit.hpp"
 
 GostTranslit::GostTranslit() {
-//    std::cout << "Initialize" << std::endl;
-    // Добавим пунктуацию
+    // Добавляем знаки пунктуации
     for (const auto& mark: punctuations) {
-//        std::cout << "p = '" << mark << "'" << std::endl;
         cyrillic2latin[mark] = mark;
         latin2cyrillic[mark] = mark;
     }
+    // Подготавливаем кеш преобразования
+    for (const auto& pair : latin2cyrillic) {
+        m_cache_latin2cyrillic.push_back(pair);
+    }
+    std::sort(m_cache_latin2cyrillic.begin(), m_cache_latin2cyrillic.end(), [](const auto& a, const auto& b) {
+        return a.first.length() > b.first.length();
+    });
+    // Подготавливаем кеш преобразования
+    for (const auto& pair : cyrillic2latin) {
+        m_cache_cyrillic2latin.push_back(pair);
+    }
+    std::sort(m_cache_cyrillic2latin.begin(), m_cache_cyrillic2latin.end(), [](const auto& a, const auto& b) {
+        return a.first.length() > b.first.length();
+    });
 }
 
 static bool startsWith(const std::string& str, const std::string& prefix) {
@@ -22,24 +34,12 @@ std::string GostTranslit::to_latin(const std::string& input) {
     std::string in = input;
     std::string out;
     //
-    std::vector<std::pair<std::string, std::string>> elements;
-    for (const auto& pair : cyrillic2latin) {
-        elements.push_back(pair);
-    }
-    std::sort(elements.begin(), elements.end(), [](const auto& a, const auto& b) {
-        return a.first.length() > b.first.length();
-    });
-    //
     while (!in.empty()) {
         bool map = false;
-        for (const auto& pair : elements) {
-            const std::string& key = pair.first;
-            const std::string& value = pair.second;
-
-            std::string prefix = key;
-            if (startsWith(in, prefix)) {
-                out += value;
-                size_t prefixSize = prefix.length();
+        for (const auto& pair : m_cache_cyrillic2latin) {
+            if (startsWith(in, pair.first)) {
+                out += pair.second;
+                size_t prefixSize = pair.first.length();
 //                std::cout << "key = " << key << " prefix = '" << prefix << "' prefixSize = " << prefixSize << std::endl;
                 in.erase(0, prefixSize);
                 map = true;
@@ -58,23 +58,12 @@ std::string GostTranslit::to_cyrillic(const std::string& input) {
     std::string in = input;
     std::string out;
     //
-    std::vector<std::pair<std::string, std::string>> elements;
-    for (const auto& pair : latin2cyrillic) {
-        elements.push_back(pair);
-    }
-    std::sort(elements.begin(), elements.end(), [](const auto& a, const auto& b) {
-        return a.first.length() > b.first.length();
-    });
-    //
     while (!in.empty()) {
         bool map = false;
-        for (const auto& pair : elements) {
-            const std::string& key = pair.first;
-            const std::string& value = pair.second;
-            std::string prefix = key;
-            if (startsWith(in, prefix)) {
-                out += value;
-                size_t prefixSize = prefix.length();
+        for (const auto& pair : m_cache_latin2cyrillic) {
+            if (startsWith(in, pair.first)) {
+                out += pair.second;
+                size_t prefixSize = pair.first.length();
 //                std::cout << "key = " << key << " prefix = '" << prefix << "' prefixSize = " << prefixSize << std::endl;
                 in.erase(0, prefixSize);
                 map = true;

@@ -6,10 +6,6 @@
 #include <map>
 
 class GostTranslit {
-public:
-    GostTranslit();
-    std::string to_latin(const std::string& input);
-    std::string to_cyrillic(const std::string& input);
 protected:
 
     std::map<std::string, std::string> cyrillic2latin = {
@@ -61,6 +57,14 @@ protected:
         ".", ",", "!", "?", ":", ";", "-", "(", ")", "[", "]", 
         "{", "}", "\"", "'", " ", "\t", "\n"
     };
+
+    std::vector<std::pair<std::string, std::string>> m_cache_cyrillic2latin;
+    std::vector<std::pair<std::string, std::string>> m_cache_latin2cyrillic;
+
+public:
+    GostTranslit();
+    std::string to_latin(const std::string& input);
+    std::string to_cyrillic(const std::string& input);
 
 };
 
