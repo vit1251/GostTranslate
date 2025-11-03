@@ -1,5 +1,7 @@
 # GostTranslate — Cyrillic-Latin Transliterator
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/vit1251/GostTranslate)
+
 This project provides a robust solution for converting text from Cyrillic to Latin
 and from Latin to Cyrillic (vice versa). It is designed to comply with various GOST
 transliteration standards (such as GOST 7.79-2000), ensuring accuracy for official
